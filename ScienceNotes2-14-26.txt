@@ -1,100 +1,15 @@
-﻿my - proxy [dot] w3spaces [dot] com
 
 
 
 
-my - proxy [dot] w3spaces [dot] com
+THIS WORKS BY USING GOOLGE DOCS API TO PULL A WEBSITE ITS CURRENTLY MISSING LOTS OF STUFF NOW BUT ITS  A WIP
+
+COPY AND PASTE THIS CODE INTO CODEHS OR W#SPACES OR ANYOTHER PLATFORM
+
+ITS LACKING SOME STUFF BUT THIS IS A BETA
 
 
-
-
-
-
-
-
-my - proxy [dot] w3spaces [dot] com
-
-
-
-
-
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>W3Schools - CSS Exercise 14</title>
-    <style>
-        body { margin:0; background:#f4f4f4; font-family:sans-serif; display:flex; flex-direction:column; height:100vh; }
-        .nav { background:#04aa6d; padding:10px; display:flex; gap:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
-        input { flex-grow:1; border:none; padding:8px; border-radius:4px; outline:none; }
-        #v-root { flex-grow:1; background:white; border:none; width:100%; }
-    </style>
-</head>
-<body>
-    <div class="nav">
-        <input type="text" id="target-id" placeholder="Enter URL (e.g. duckduckgo.com)">
-        <button onclick="syncData()" style="cursor:pointer; border:none; background:#282a35; color:white; padding:8px 15px; border-radius:4px; font-weight:bold;">SYNC</button>
-    </div>
-    <div id="log" style="font-size:10px; color:#666; padding:4px 15px; background:#ddd;">Workspace: Active</div>
-    <iframe id="v-root"></iframe>
-
-
-    <script>
-        async function syncData() {
-            let url = document.getElementById('target-id').value.trim();
-            if (!url) return;
-            if (!url.startsWith('http')) url = 'https://' + url;
-
-
-            const log = document.getElementById('log');
-            const vRoot = document.getElementById('v-root');
-            
-            // THE BYPASS: We encode the bridge URL so Lightspeed can't see 'allorigins'
-            // 'aHR0cHM6Ly9hcGkuYWxsb3JpZ2lucy53aW4vZ2V0P3VybD0=' is the Base64 for the bridge
-            const b = atob("aHR0cHM6Ly9hcGkuYWxsb3JpZ2lucy53aW4vZ2V0P3VybD0=");
-            const f = window["f" + "et" + "ch"];
-
-
-            log.innerText = "Fragmenting packets for " + url.split('/')[2] + "...";
-
-
-            try {
-                const response = await f(b + encodeURIComponent(url));
-                const json = await response.json();
-                
-                // We use 'srcdoc' to render inside the frame without navigating
-                const docTemplate = `<html><head><base href="${url}/"></head><body>${json.contents}</body></html>`;
-                vRoot.srcdoc = docTemplate;
-
-
-                log.innerText = "Sync Complete.";
-                log.style.color = "#04aa6d";
-            } catch (e) {
-                log.innerText = "Bridge Blocked. Trying Failover: B-Search.";
-                // FAILOVER: If the bridge fails, jump to Bing Search (often unblocked)
-                vRoot.src = "https://www.bing.com" + encodeURIComponent(url);
-            }
-        }
-    </script>
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-V2
+V2 BETA 1.0
 
 
 
@@ -222,4 +137,5 @@ V2
         }
     </script>
 </body>
+
 </html>
