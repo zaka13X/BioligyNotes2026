@@ -1,0 +1,225 @@
+﻿my - proxy [dot] w3spaces [dot] com
+
+
+
+
+my - proxy [dot] w3spaces [dot] com
+
+
+
+
+
+
+
+
+my - proxy [dot] w3spaces [dot] com
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>W3Schools - CSS Exercise 14</title>
+    <style>
+        body { margin:0; background:#f4f4f4; font-family:sans-serif; display:flex; flex-direction:column; height:100vh; }
+        .nav { background:#04aa6d; padding:10px; display:flex; gap:10px; box-shadow:0 2px 5px rgba(0,0,0,0.2); }
+        input { flex-grow:1; border:none; padding:8px; border-radius:4px; outline:none; }
+        #v-root { flex-grow:1; background:white; border:none; width:100%; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <input type="text" id="target-id" placeholder="Enter URL (e.g. duckduckgo.com)">
+        <button onclick="syncData()" style="cursor:pointer; border:none; background:#282a35; color:white; padding:8px 15px; border-radius:4px; font-weight:bold;">SYNC</button>
+    </div>
+    <div id="log" style="font-size:10px; color:#666; padding:4px 15px; background:#ddd;">Workspace: Active</div>
+    <iframe id="v-root"></iframe>
+
+
+    <script>
+        async function syncData() {
+            let url = document.getElementById('target-id').value.trim();
+            if (!url) return;
+            if (!url.startsWith('http')) url = 'https://' + url;
+
+
+            const log = document.getElementById('log');
+            const vRoot = document.getElementById('v-root');
+            
+            // THE BYPASS: We encode the bridge URL so Lightspeed can't see 'allorigins'
+            // 'aHR0cHM6Ly9hcGkuYWxsb3JpZ2lucy53aW4vZ2V0P3VybD0=' is the Base64 for the bridge
+            const b = atob("aHR0cHM6Ly9hcGkuYWxsb3JpZ2lucy53aW4vZ2V0P3VybD0=");
+            const f = window["f" + "et" + "ch"];
+
+
+            log.innerText = "Fragmenting packets for " + url.split('/')[2] + "...";
+
+
+            try {
+                const response = await f(b + encodeURIComponent(url));
+                const json = await response.json();
+                
+                // We use 'srcdoc' to render inside the frame without navigating
+                const docTemplate = `<html><head><base href="${url}/"></head><body>${json.contents}</body></html>`;
+                vRoot.srcdoc = docTemplate;
+
+
+                log.innerText = "Sync Complete.";
+                log.style.color = "#04aa6d";
+            } catch (e) {
+                log.innerText = "Bridge Blocked. Trying Failover: B-Search.";
+                // FAILOVER: If the bridge fails, jump to Bing Search (often unblocked)
+                vRoot.src = "https://www.bing.com" + encodeURIComponent(url);
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+V2
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>W3Schools - Advanced Iframe Exercise 14</title>
+    <style>
+        :root { --w3-green: #04aa6d; --w3-dark: #282a35; --w3-light: #f1f1f1; }
+        body { margin:0; background: var(--w3-light); font-family: 'Segoe UI', sans-serif; display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+        
+        /* Stealth Navigation Bar */
+        .nav { background: var(--w3-dark); color:white; padding:8px 15px; display:flex; gap:12px; z-index:1000; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        input { flex-grow:1; border:none; padding:10px; border-radius:20px; outline:none; background: #3c4043; color: #00ff95; font-family: monospace; font-size: 13px; }
+        
+        .btn { background: var(--w3-green); color:white; border:none; padding:10px 18px; border-radius:20px; cursor:pointer; font-weight:bold; font-size: 11px; text-transform: uppercase; }
+        .btn:hover { background: #059862; transform: scale(1.02); }
+        
+        #v-root { flex-grow:1; background:white; border:none; width:100%; height: 100%; }
+        #log-bar { font-size:10px; color:#888; padding:4px 20px; background:#1e1e1e; border-top: 1px solid #333; }
+        
+        /* Emergency Cloak Overlay */
+        #cloak { position:fixed; top:0; left:0; width:100%; height:100%; background:white; display:none; z-index:9999; }
+    </style>
+</head>
+<body>
+    <!-- The Panic Screen (Triggered by ESC) -->
+    <div id="cloak">
+        <iframe src="https://www.w3schools.com" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+
+
+    <div class="nav" id="main-nav">
+        <div style="width: 10px; height: 10px; background: var(--w3-green); border-radius: 50%;"></div>
+        <input type="text" id="target-url" placeholder="Enter Lesson Reference (e.g. google.com)" onkeydown="if(event.key==='Enter') executeSync()">
+        <button class="btn" onclick="executeSync()">Sync Data</button>
+        <button onclick="document.getElementById('v-root').srcdoc = '';" style="background:#ff4b2b; color:white; border:none; padding:8px 12px; border-radius:20px; cursor:pointer; font-size:10px;">FLUSH RAM</button>
+    </div>
+    
+    <div id="log-bar">Status: Workspace Ready. Press [ESC] for Emergency Tutorial Mode.</div>
+    <iframe id="v-root" name="v-root" allow="fullscreen; autoplay; cursor-lock; keyboard-lock"></iframe>
+
+
+    <script>
+        // PANIC KEY: Press 'Escape' to instantly hide the proxy
+        document.addEventListener('keydown', function(e) {
+            if (e.key === "Escape") {
+                document.getElementById('cloak').style.display = 'block';
+                document.getElementById('main-nav').style.display = 'none';
+                console.log("Cloak Engaged.");
+            }
+        });
+
+
+        async function executeSync() {
+            let address = document.getElementById('target-url').value.trim();
+            if (!address) return;
+            if (!address.startsWith('http')) address = 'https://' + address;
+
+
+            const log = document.getElementById('log-bar');
+            const vRoot = document.getElementById('v-root');
+            
+            // Bridge: AllOrigins (Base64 Encoded to hide from packet sniffers)
+            const b = atob("aHR0cHM6Ly9hcGkuYWxsb3JpZ2lucy53aW4vZ2V0P3VybD0=");
+            const f = window["f" + "et" + "ch"];
+
+
+            log.innerText = "Reconstructing academic stream for " + address.split('/')[2] + "...";
+
+
+            try {
+                const response = await f(b + encodeURIComponent(address));
+                const json = await response.json();
+                
+                // GAME-READY TEMPLATE: Supports modern CSS and script redirection
+                const docTemplate = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <base href="${address}/">
+                        <style>
+                            body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: auto; background: #fff; }
+                            img { max-width: 100%; height: auto; }
+                            canvas { width: 100% !important; height: 100% !important; }
+                            /* Fix for Google black bar */
+                            #gb { position: sticky !important; top: 0; background: #222 !important; }
+                        </style>
+                    </head>
+                    <body>
+                        ${json.contents}
+                        <script>
+                            // Script to fix broken relative links in modern games/sites
+                            document.querySelectorAll('script').forEach(s => {
+                                if(s.src && !s.src.startsWith('http')) {
+                                    s.src = new URL(s.getAttribute('src'), '${address}/').href;
+                                }
+                            });
+                        <\/script>
+                    </body>
+                    </html>`;
+                
+                vRoot.srcdoc = docTemplate;
+                log.innerText = "Stream Integrated. Memory Status: Stable.";
+                log.style.color = "#04aa6d";
+                
+                // CLEAR INPUT: Hides what you just typed
+                document.getElementById('target-url').value = ""; 
+
+
+            } catch (e) {
+                log.innerText = "Gateway Refused. Launching via Bing Academic Mirror...";
+                log.style.color = "#ff4b2b";
+                vRoot.src = "https://www.bing.com" + encodeURIComponent(address);
+            }
+        }
+    </script>
+</body>
+</html>
