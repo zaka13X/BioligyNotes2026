@@ -1,0 +1,62 @@
+V1 <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stealth CORS Proxy</title>
+    <style>
+        :root { --bg: #0d1117; --text: #c9d1d9; --accent: #58a6ff; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; margin: 0; }
+        .nav { background: #161b22; padding: 15px; border-bottom: 1px solid #30363d; display: flex; gap: 10px; align-items: center; }
+        input, select, button { background: #0d1117; border: 1px solid #30363d; color: white; padding: 8px; border-radius: 6px; }
+        input { flex-grow: 1; }
+        button:hover { background: var(--accent); cursor: pointer; }
+        #viewer { flex-grow: 1; background: white; border: none; }
+        .status { font-size: 12px; padding: 5px; background: #21262d; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="nav">
+    <select id="bridge">
+        <option value="https://cors-anywhere.herokuapp.com/">CORS Anywhere</option>
+        <option value="https://allorigins.win">AllOrigins</option>
+        <option value="https://codetabs.com">Codetabs</option>
+        <option value="https://proxy.corsfix.com/?">Corsfix</option>
+    </select>
+    <input type="text" id="targetUrl" placeholder="https://example.com">
+    <button onclick="fetchContent()">Fetch</button>
+</div>
+
+<div class="status" id="status">Ready. Select bridge and enter URL.</div>
+<div id="output" style="padding: 20px; overflow-y: auto; white-space: pre-wrap;"></div>
+
+<script>
+    async function fetchContent() {
+        const bridge = document.getElementById('bridge').value;
+        const target = document.getElementById('targetUrl').value;
+        const status = document.getElementById('status');
+        const output = document.getElementById('output');
+
+        if (!target) return alert("Enter a URL!");
+        
+        status.innerText = "Connecting to " + bridge + "...";
+        
+        try {
+            const response = await fetch(bridge + target, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' } // Fixes the "Missing Header" error
+            });
+            
+            if (!response.ok) throw new Error("Proxy returned " + response.status);
+            
+            const data = await response.text();
+            output.innerText = data;
+            status.innerText = "Success!";
+        } catch (err) {
+            output.innerText = "Error: " + err.message;
+            status.innerText = "Failed to fetch content.";
+        }
+    }
+</script>
+</body>
+</html>
