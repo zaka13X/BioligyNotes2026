@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> v1.23 (made by zaka)</title>
+    <style>
+        :root { --bg: #0d1117; --text: #c9d1d9; --accent: #58a6ff; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; margin: 0; }
+        .nav { background: #161b22; padding: 10px; border-bottom: 1px solid #30363d; display: flex; gap: 10px; }
+        input, select, button { background: #0d1117; border: 1px solid #30363d; color: white; padding: 8px; border-radius: 6px; }
+        input { flex-grow: 1; }
+        button { cursor: pointer; }
+        button:hover { background: #21262d; border-color: var(--accent); }
+        /* RENDER VIEWER */
+        #viewer { flex-grow: 1; background: white; border: none; width: 100%; }
+        .status { font-size: 12px; padding: 5px; background: #21262d; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <select id="bridge">
+            <option value="https://cors-anywhere.herokuapp.com/">CORS Anywhere</option>
+            <option value="https://api.allorigins.win/get?url=">AllOrigins</option>
+        </select>
+        <input type="text" id="targetUrl" placeholder="https://example.com" value="https://example.com">
+        <button onclick="fetchContent()">View Site</button>
+    </div>
+    <div class="status" id="status">Ready.</div>
+    
+    <!-- Changed from div to iframe for rendering -->
+    <iframe id="viewer"></iframe>
+
+    <script>
+        async function fetchContent() {
+            const bridge = document.getElementById('bridge').value;
+            const target = document.getElementById('targetUrl').value;
+            const status = document.getElementById('status');
+            const viewer = document.getElementById('viewer');
+            
+            if (!target) return alert("Enter a URL!");
+            status.innerText = "Fetching...";
+
+            try {
+                // Using cors-anywhere format
+                const response = await fetch(bridge + target, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                
+                if (!response.ok) throw new Error("Proxy error: " + response.status);
+                
+                const html = await response.text();
+                
+                // --- THE FIX ---
+                // Load HTML into iframe instead of setting innerText
+                viewer.srcdoc = html; 
+                status.innerText = "Loaded: " + target;
+            } catch (err) {
+                viewer.srcdoc = "Error: " + err.message;
+                status.innerText = "Failed.";
+            }
+        }
+    </script>
+</body>
+</html>
