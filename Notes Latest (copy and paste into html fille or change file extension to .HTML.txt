@@ -3,11 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checking your browser....(Cloudflare reCATCHPA)</title>
+    <title>Checking your browser.... Cloudflare 524 Browser Check</title>
     <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #1a1a1a;
+            --accent: #3b82f6;
+            --text: #e5e5e5;
+        }
+
         body {
-            background-color: #0d1117;
-            color: #c9d1d9;
+            background-color: var(--bg);
+            color: var(--text);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             display: flex;
@@ -16,200 +23,209 @@
             overflow: hidden;
         }
 
-        /* Top Toolbar */
+        /* Header & Toolbar */
         .toolbar {
-            background-color: #161b22;
+            background: var(--surface);
             padding: 10px 20px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid #30363d;
+            gap: 15px;
+            border-bottom: 1px solid #333;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
-        #url-input {
+        .url-container {
             flex-grow: 1;
-            background-color: #0d1117;
-            border: 1px solid #30363d;
+            display: flex;
+            background: #000;
+            border-radius: 8px;
+            padding: 5px 15px;
+            border: 1px solid #444;
+        }
+
+        input[type="text"] {
+            background: transparent;
+            border: none;
             color: white;
-            padding: 10px 15px;
-            border-radius: 6px;
+            width: 100%;
+            padding: 8px;
             outline: none;
-            font-size: 14px;
         }
 
         button {
-            background-color: #238636;
+            background: var(--accent);
             color: white;
             border: none;
-            padding: 10px 18px;
+            padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            transition: 0.2s;
+            transition: opacity 0.2s;
         }
 
-        button:hover { background-color: #2ea043; }
+        button:hover { opacity: 0.8; }
 
-        .proxy-btn { background-color: #21262d; border: 1px solid #30363d; }
-        .proxy-btn:hover { background-color: #30363d; }
-
-        /* Proxy Modal */
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 999;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
 
         .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #161b22;
+            background: var(--surface);
             padding: 30px;
             border-radius: 12px;
-            border: 1px solid #30363d;
-            z-index: 1000;
-            width: 380px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            width: 400px;
+            border: 1px solid #444;
         }
 
-        .modal h3 { margin: 0 0 20px 0; color: #58a6ff; }
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; margin-bottom: 8px; font-size: 0.85em; color: #8b949e; }
-        .input-group input, .input-group select {
+        .modal h2 { margin-top: 0; color: var(--accent); }
+
+        .form-group { margin-bottom: 15px; }
+
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9em; color: #aaa; }
+
+        select, .form-group input {
             width: 100%;
             padding: 10px;
-            background: #0d1117;
-            border: 1px solid #30363d;
+            background: #111;
+            border: 1px solid #444;
             color: white;
-            border-radius: 6px;
+            border-radius: 4px;
             box-sizing: border-box;
-            outline: none;
         }
 
-        /* Status Bar */
-        .status-bar {
-            font-size: 0.75em;
-            padding: 6px 20px;
-            background: #0d1117;
-            color: #8b949e;
-            border-bottom: 1px solid #30363d;
-        }
-
-        /* Iframe Viewport */
-        #content-frame {
+        /* Viewport */
+        #viewport {
             flex-grow: 1;
             border: none;
             background: white;
+        }
+
+        .status-bar {
+            font-size: 12px;
+            padding: 5px 20px;
+            background: #111;
+            color: #666;
         }
     </style>
 </head>
 <body>
 
     <div class="toolbar">
-        <button class="proxy-btn" onclick="toggleModal()">Add Proxy</button>
-        <input type="text" id="url-input" placeholder="Enter target URL (e.g., https://example.com)" value="https://example.com">
+        <button onclick="toggleModal(true)">+ Add Proxy</button>
+        <div class="url-container">
+            <input type="text" id="urlInput" placeholder="https://example.com" value="https://google.com">
+        </div>
         <button onclick="navigate()">Go</button>
     </div>
 
-    <div class="status-bar" id="proxy-status">Status: Using CORS Anywhere (Auto)</div>
+    <div class="status-bar" id="proxyStatus">Active Proxy: CORS Anywhere (Auto)</div>
 
-    <iframe id="content-frame" src="about:blank"></iframe>
+    <iframe id="viewport" src="about:blank"></iframe>
 
-    <!-- Proxy Settings Modal -->
-    <div class="modal-overlay" id="overlay" onclick="toggleModal()"></div>
-    <div class="modal" id="proxy-modal">
-        <h3>Proxy Configuration</h3>
-        
-        <div class="input-group">
-            <label>Proxy Type</label>
-            <select id="proxy-type" onchange="handleTypeChange()">
-                <option value="cors-anywhere" selected>CORS Anywhere (Auto)</option>
-                <option value="wisp">WISP Proxy</option>
-                <option value="https">HTTPS Proxy</option>
-                <option value="socks5">SOCKS5 (HTML Download Only)</option>
-                <option value="http">HTTP (HTML Download Only)</option>
-            </select>
-        </div>
-
-        <div id="manual-settings" style="display: none;">
-            <div class="input-group">
-                <label>IP Address/Hostname</label>
-                <input type="text" id="proxy-ip" placeholder="e.g. 192.168.1.1">
+    <!-- Proxy Modal -->
+    <div class="modal-overlay" id="proxyModal">
+        <div class="modal">
+            <h2>Proxy Settings</h2>
+            <div class="form-group">
+                <label>Proxy Type</label>
+                <select id="proxyType" onchange="toggleFields()">
+                    <option value="cors-anywhere" selected>CORS Anywhere (Auto)</option>
+                    <option value="https">HTTPS (Custom)</option>
+                    <option value="wisp">WISP</option>
+                    <option value="socks5">SOCKS5 (Download Only)</option>
+                    <option value="http">HTTP (Download Only)</option>
+                </select>
             </div>
-            <div class="input-group">
-                <label>Port</label>
-                <input type="text" id="proxy-port" placeholder="e.g. 8080">
+            
+            <div id="customFields" style="display: none;">
+                <div class="form-group">
+                    <label>IP Address / Host</label>
+                    <input type="text" id="proxyHost" placeholder="1.2.3.4">
+                </div>
+                <div class="form-group">
+                    <label>Port</label>
+                    <input type="text" id="proxyPort" placeholder="8080">
+                </div>
+                <div class="form-group">
+                    <label>Username (Optional)</label>
+                    <input type="text" id="proxyUser">
+                </div>
+                <div class="form-group">
+                    <label>Password (Optional)</label>
+                    <input type="password" id="proxyPass">
+                </div>
             </div>
-        </div>
 
-        <div style="display: flex; gap: 10px; margin-top: 25px;">
-            <button onclick="saveProxy()" style="flex: 1;">Apply Settings</button>
-            <button onclick="toggleModal()" class="proxy-btn" style="flex: 1;">Cancel</button>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button style="flex: 1;" onclick="saveProxy()">Apply Proxy</button>
+                <button style="flex: 1; background: #444;" onclick="toggleModal(false)">Cancel</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let config = { type: 'cors-anywhere', ip: '', port: '' };
+        let currentProxy = { type: 'cors-anywhere' };
 
-        function toggleModal() {
-            const modal = document.getElementById('proxy-modal');
-            const overlay = document.getElementById('overlay');
-            const show = modal.style.display !== 'block';
-            modal.style.display = show ? 'block' : 'none';
-            overlay.style.display = show ? 'block' : 'none';
+        function toggleModal(show) {
+            document.getElementById('proxyModal').style.display = show ? 'flex' : 'none';
         }
 
-        function handleTypeChange() {
-            const type = document.getElementById('proxy-type').value;
-            document.getElementById('manual-settings').style.display = (type === 'cors-anywhere') ? 'none' : 'block';
+        function toggleFields() {
+            const type = document.getElementById('proxyType').value;
+            document.getElementById('customFields').style.display = (type === 'cors-anywhere') ? 'none' : 'block';
         }
 
         function saveProxy() {
-            config.type = document.getElementById('proxy-type').value;
-            config.ip = document.getElementById('proxy-ip').value;
-            config.port = document.getElementById('proxy-port').value;
+            currentProxy = {
+                type: document.getElementById('proxyType').value,
+                host: document.getElementById('proxyHost').value,
+                port: document.getElementById('proxyPort').value,
+                user: document.getElementById('proxyUser').value,
+                pass: document.getElementById('proxyPass').value
+            };
             
-            const typeLabel = document.getElementById('proxy-type').options[document.getElementById('proxy-type').selectedIndex].text;
-            document.getElementById('proxy-status').innerText = `Status: Using ${typeLabel}` + (config.ip ? ` (${config.ip}:${config.port})` : '');
-            toggleModal();
+            document.getElementById('proxyStatus').innerText = `Active Proxy: ${currentProxy.type.toUpperCase()} ${currentProxy.host || ''}`;
+            toggleModal(false);
+            alert('Proxy configuration updated!');
         }
 
         async function navigate() {
-            const targetUrl = document.getElementById('url-input').value;
-            const frame = document.getElementById('content-frame');
+            const url = document.getElementById('urlInput').value;
+            const iframe = document.getElementById('viewport');
 
-            if (config.type === 'cors-anywhere') {
-                const proxyBase = 'https://cors-anywhere.herokuapp.com/';
+            if (currentProxy.type === 'cors-anywhere') {
+                // Implementing CORS Anywhere logic with required headers
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
                 
                 try {
-                    // Fetching through proxy with required headers
-                    const response = await fetch(proxyBase + targetUrl, {
-                        method: 'GET',
+                    const response = await fetch(proxyUrl + url, {
                         headers: {
-                            'X-Requested-With': 'XMLHttpRequest', // Fixes "Missing required request header"
-                            'Origin': window.location.origin      // Required for CORS handshakes
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Origin': window.location.origin
                         }
                     });
-                    
-                    if (!response.ok) throw new Error();
                     const html = await response.text();
                     
-                    const doc = frame.contentWindow.document;
-                    doc.open();
-                    doc.write(html);
-                    doc.close();
-                } catch (e) {
-                    alert('Error: Please ensure you have requested temporary access at https://cors-anywhere.herokuapp.com/corsdemo first.');
+                    // Injecting content into iframe
+                    const blob = new Blob([html], { type: 'text/html' });
+                    iframe.src = URL.createObjectURL(blob);
+                } catch (err) {
+                    alert("CORS Anywhere error. Make sure you visited https://cors-anywhere.herokuapp.com/corsdemo to request access.");
                 }
             } else {
-                // Browsers do not allow raw TCP/Proxy tunneling via client-side JS alone
-                alert(`Routing via ${config.type} at ${config.ip}:${config.port}. (Simulated)`);
-                frame.src = targetUrl;
+                // For SOCKS5/HTTP/WISP/HTTPS custom:
+                // Standard browsers do not allow changing proxy settings via JS for security.
+                // We simulate the intent by attempting a direct load or logging the config.
+                console.log("Routing through custom proxy:", currentProxy);
+                iframe.src = url;
+                alert(`${currentProxy.type.toUpperCase()} selected. Note: Browsers require a browser extension or system-wide settings to route raw socket traffic.`);
             }
         }
     </script>
