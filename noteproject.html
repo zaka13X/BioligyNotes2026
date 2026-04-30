@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wisp Chrome-Lite</title>
+    <!-- Using the full libcurl.js bundle for better single-file compatibility -->
+    <script src="https://cdn.jsdelivr.net/npm/libcurl.js@latest/libcurl_full.js"></script>
+    <style>
+        :root { --bg: #dee1e6; --tab-active: #ffffff; --tab-inactive: #bdc1c6; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; height: 100vh; background: var(--bg); overflow: hidden; }
+        #tab-bar { display: flex; align-items: flex-end; padding: 8px 8px 0 8px; gap: 4px; background: var(--bg); user-select: none; }
+        .tab { background: var(--tab-inactive); padding: 8px 15px; border-radius: 8px 8px 0 0; min-width: 120px; font-size: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border: none; }
+        .tab.active { background: var(--tab-active); }
+        .close-btn { margin-left: 10px; cursor: pointer; }
+        #toolbar { background: var(--tab-active); padding: 8px; display: flex; gap: 10px; border-bottom: 1px solid #ccc; }
+        input { padding: 8px; border: 1px solid #ccc; border-radius: 20px; outline: none; }
+        #url-input { flex-grow: 1; }
+        #viewport-container { flex-grow: 1; background: white; position: relative; }
+        .viewport { width: 100%; height: 100%; border: none; display: none; }
+        .viewport.active { display: block; }
+        #status-bar { position: fixed; bottom: 0; left: 0; background: rgba(0,0,0,0.7); color: white; padding: 2px 10px; font-size: 10px; z-index: 100; display: none; }
+    </style>
+</head>
+<body>
+
+<div id="tab-bar">
+    <button onclick="addTab()" style="background:none; border:none; font-size:18px; cursor:pointer;">+</button>
+</div>
+
+<div id="toolbar">
+    <input type="text" id="wisp-input" placeholder="Wisp Server" value="wss://wisp.mercurywork.shop/" style="width:200px;">
+    <input type="text" id="url-input" placeholder="Enter URL (e.g. https://google.com)" onkeypress="if(event.key==='Enter') navigate()">
+    <button onclick="navigate()">Go</button>
+</div>
+
+<div id="viewport-container"></div>
+<div id="status-bar">Loading...</div>
+
+<script>
+    let tabs = [];
+    let activeTabId = null;
+
+    async function navigate() {
+        const urlInput = document.getElementById('url-input');
+        const wispInput = document.getElementById('wisp-input');
+        const statusBar = document.getElementById('status-bar');
+        
+        let url = urlInput.value.trim();
+        if (!url) return;
+        if (!url.startsWith('http')) url = 'https://' + url;
+
+        const tab = tabs.find(t => t.id === activeTabId);
+        if (!tab) return;
+
+        tab.url = url;
+        updateTabUI();
+        statusBar.style.display = 'block';
+
+        try {
+            // 1. Set the Wisp server (Must end with /)
+            let wispUrl = wispInput.value.trim();
+            if (!wispUrl.endsWith('/')) wispUrl += '/';
+            
+            // 2. Initialize libcurl with the Wisp proxy
+            await libcurl.set_websocket(wispUrl);
+
+            // 3. Fetch the content
+            const response = await libcurl.fetch(url);
+            const html = await response.text();
+
+            // 4. Inject with <base> tag to fix relative links/images
+            const iframe = document.getElementById(`iframe-${tab.id}`);
+            const baseTag = `<base href="${url}">`;
+            iframe.srcdoc = baseTag + html;
+            
+        } catch (e) {
+            console.error(e);
+            alert("Proxy Error: Check your Wisp URL or the site's availability.");
+        } finally {
+            statusBar.style.display = 'none';
+        }
+    }
+
+    function addTab() {
+        const id = Date.now();
+        tabs.push({ id, url: 'about:blank' });
+        
+        const iframe = document.createElement('iframe');
+        iframe.id = `iframe-${id}`;
+        iframe.className = 'viewport';
+        iframe.sandbox = "allow-scripts allow-forms allow-same-origin";
+        document.getElementById('viewport-container').appendChild(iframe);
+        
+        switchTab(id);
+    }
+
+    function switchTab(id) {
+        activeTabId = id;
+        document.querySelectorAll('.viewport').forEach(f => f.classList.remove('active'));
+        document.getElementById(`iframe-${id}`).classList.add('active');
+        
+        const tab = tabs.find(t => t.id === id);
+        document.getElementById('url-input').value = tab.url === 'about:blank' ? '' : tab.url;
+        updateTabUI();
+    }
+
+    function updateTabUI() {
+        const tabBar = document.getElementById('tab-bar');
+        tabBar.querySelectorAll('.tab').forEach(t => t.remove());
+        
+        tabs.forEach(tab => {
+            const btn = document.createElement('button');
+            btn.className = `tab ${tab.id === activeTabId ? 'active' : ''}`;
+            btn.innerHTML = `<span>${tab.url === 'about:blank' ? 'New Tab' : new URL(tab.url).hostname}</span>`;
+            btn.onclick = () => switchTab(tab.id);
+            tabBar.insertBefore(btn, tabBar.lastElementChild);
+        });
+    }
+
+    // Start with one tab
+    window.onload = addTab;
+</script>
+</body>
+</html>
