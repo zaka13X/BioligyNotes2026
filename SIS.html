@@ -27,12 +27,13 @@
         
         /* Grades Table */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th { background-color: #f8f9fa; border: 1px solid #d1d5da; padding: 10px; text-align: left; color: #555; }
-        td { border: 1px solid #d1d5da; padding: 10px; color: #333; }
+        th { background-color: #f8f9fa; border: 1px solid #d1d5da; padding: 10px; text-align: center; color: #555; }
+        th.left, td.left { text-align: left; }
+        td { border: 1px solid #d1d5da; padding: 10px; color: #333; text-align: center; }
         tr:nth-child(even) { background-color: #fafbfc; }
         
         .null-text { font-style: italic; color: #a1a1a1; }
-        .grade-link { color: #0056b3; text-decoration: underline; cursor: pointer; }
+        .grade-link { color: #0056b3; text-decoration: underline; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -59,41 +60,40 @@
             <thead>
                 <tr>
                     <th>Exp</th>
-                    <th>Course</th>
-                    <th>Teacher</th>
-                    <th>Grade</th>
-                    <th>Score</th>
+                    <th class="left">Course</th>
+                    <th class="left">Teacher</th>
+                    <th>Q3</th>
+                    <th>Q4</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>1(A-B)</td>
-                    <td>Science</td>
-                    <td class="null-text">80</td>
+                    <td class="left">Science</td>
+                    <td class="null-text left">NULL</td>
                     <td><span class="grade-link">80</span></td>
-                    <td class="null-text">80</td>
+                    <td><span class="grade-link">80</span></td>
                 </tr>
                 <tr>
                     <td>2(A-B)</td>
-                    <td>Phy Ed</td>
-                    <td class="null-text">85</td>
+                    <td class="left">Phy Ed</td>
+                    <td class="null-text left">NULL</td>
                     <td><span class="grade-link">85</span></td>
-                    <td class="null-text">85
-                    </td>
+                    <td><span class="grade-link">85</span></td>
                 </tr>
                 <tr>
                     <td>3(A-B)</td>
-                    <td>Spanish </td>
-                    <td class="null-text">83</td>
+                    <td class="left">Spanish</td>
+                    <td class="null-text left">NULL</td>
                     <td><span class="grade-link">83</span></td>
-                    <td class="null-text">83</td>
+                    <td><span class="grade-link">83</span></td>
                 </tr>
                 <tr>
                     <td>4(A-B)</td>
-                    <td>Individuals and Societies</td>
-                    <td class="null-text">86</td>
+                    <td class="left">Individuals and Societies</td>
+                    <td class="null-text left">NULL</td>
                     <td><span class="grade-link">86</span></td>
-                    <td class="null-text">86</td>
+                    <td><span class="grade-link">86</span></td>
                 </tr>
             </tbody>
         </table>
