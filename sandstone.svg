@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%" preserveAspectRatio="none">
+  <foreignObject width="100%" height="100%">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+      <head>
+        <style>
+          html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: transparent;
+          }
+          iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+          }
+        </style>
+      </head>
+      <body>
+        <!-- Note: Replace the placeholder URL with your real ://githubusercontent.com link -->
+        <iframe srcdoc="&lt;!DOCTYPE html&gt;
+        &lt;html&gt;
+          &lt;head&gt;
+            &lt;style&gt;
+              body {
+                margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                font-family: sans-serif;
+                background: #121212;
+                color: #ffffff;
+              }
+            &lt;/style&gt;
+          &lt;/head&gt;
+          &lt;body&gt;
+            &lt;div id='loader'&gt;Loading external page...&lt;/div&gt;
+
+            &lt;script&gt;
+              const targetUrl = 'https://raw.githubusercontent.com/zaka13X/BioligyNotes2026/refs/heads/main/sandstone.html';
+
+              async function loadRemoteContent() {
+                try {
+                  const response = await fetch(targetUrl);
+                  if (!response.ok) throw new Error('Network error');
+                  const htmlContent = await response.text();
+                  
+                  document.open();
+                  document.write(htmlContent);
+                  document.close();
+                } catch (error) {
+                  document.getElementById('loader').innerText = 'Failed to load GitHub content.';
+                  console.error(error);
+                }
+              }
+
+              loadRemoteContent();
+            &lt;/script&gt;
+          &lt;/body&gt;
+        &lt;/html&gt;"></iframe>
+      </body>
+    </html>
+  </foreignObject>
+</svg>
